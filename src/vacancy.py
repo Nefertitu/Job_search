@@ -2,7 +2,7 @@ class Vacancy:
     """Класс для работы с вакансиями"""
     __slots__ = ("name_vacancy", "area", "company", "url_vacancy", "salary_from", "salary_to", "salary_currency", "type_vacancy", "date_published", "work_format", "experience")
 
-    def __init__(self, salary_from: str, data):
+    def __init__(self, data):
         """Конструктор для создания экземпляра класса `Vacancy`"""
         self.validate_data(data)
         self.name_vacancy: str = data["name"]

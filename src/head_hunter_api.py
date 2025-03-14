@@ -22,34 +22,45 @@ class HeadHunterAPI(Parser):
             response = requests.get(self.__url)
             status_code = response.status_code
             response.raise_for_status()
-    
-        except requests.exceptions.Timeout as exc_info:
-            print(f"{exc_info}: Response timed out. Please check your internet connection.")
-    
-        except requests.exceptions.ConnectionError as exc_info:
-            print(f"{exc_info}: ConnectionError. Please check your internet connection.")
-        
-        except requests.exceptions.HTTPError as exc_info:
-            print(f"{exc_info}: HTTP Error. Please check the URL.")
+
+        except requests.exceptions.RequestException as e:
+            print(f"Ошибка подключения: {e}")
+            return False
         else:
             if status_code == 200:
-                return f"{response.json()}"
-        finally:
-            print("?")
+                return True
 
     @property
     def get_connect(self):
         return HeadHunterAPI.__get_connect(self)
 
+    @property
+    def vacancies(self):
+        return self.__vacancies
+
     def load_vacancies(self, keyword):
         """Метод для загрузки вакансий"""
-
+        if not self.__get_connect():
+            return []
         self.__params['text'] = keyword
-        while self.__params.get('page') != 20:
-            response = requests.get(self.__url, headers=self.__headers, params=self.__params)
-            vacancies = response.json()['items']
-            self.__vacancies.extend(vacancies)
-            self.__params['page'] += 1
+        self.__params['page'] = 0
+        while True:
+            try:
+                response = requests.get(self.__url, headers=self.__headers, params=self.__params)
+                response.raise_for_status()
+                data = response.json()
+                vacancies = response.json()['items']
+                current_page = data['page']
+                total_pages = data['pages']
+                if  current_page >= total_pages - 1:
+                    break
+
+                self.__vacancies.extend(vacancies)
+                self.__params['page'] += 1
+            except requests.exceptions.RequestException as e:
+                print(f"Ошибка при загрузке вакансий: {e}")
+                break
+
         return self.__vacancies
 
 
