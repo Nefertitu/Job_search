@@ -8,13 +8,13 @@ class Vacancy:
         self.name_vacancy: str = data["name"]
         self.area: str = data["area"].get("name")
         self.company = data["employer"].get("name")
-        self.url_vacancy: str = data["url"]
-        self.salary_from = data["salary"].get("form")
+        self.url_vacancy: str = data["alternate_url"]
+        self.salary_from = data["salary"].get("from")
         self.salary_to = data["salary"].get("to")
         self.salary_currency = data["salary"].get("currency")
         self.type_vacancy: str = data["type"].get("name")
         self.date_published: str = data["published_at"]
-        self.work_format: str = data["work_format"].get("name")
+        self.work_format: str = data["employment_form"].get("name")
         self.experience: str = data["experience"].get("name")
 
 
@@ -33,15 +33,22 @@ class Vacancy:
 
     def validate_data(self, data):
         """Метод валидации загруженных данных о вакансиях"""
+        vacancies = []
+        # for vacancy in data:
         try:
             if not isinstance(data, dict):
                 raise ValueError("Неверный формат данных вакансии.")
-            if not all(key in Vacancy for key in ["name_vacancy", "area", "company", "url_vacancy", "salary_from", "salary_to", "salary_currency", "type_vacancy", "date_published", "work_format", "experience"]):
-                raise ValueError("Отсутствуют обязательные поля.")
-        except ValueError() as e:
+            if not all(key in data for key in
+                       ["name_vacancy", "area", "company", "url_vacancy", "salary_from", "salary_to",
+                        "salary_currency", "type_vacancy", "date_published", "work_format", "experience"]):
+                raise KeyError("Отсутствуют необходимые ключи.")
+        except Exception as e:
             print(f"{e}")
         else:
-            return self.validate_data
+            vacancy = Vacancy(data)
+            vacancies.append(vacancy)
+
+            return vacancies
 
 
     def __lt__(self, other):

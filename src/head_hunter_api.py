@@ -1,9 +1,12 @@
+import json
+
 import requests
 
-from src.parser import Parser
+from src.parser import ParserAPI
+from src.vacancy import Vacancy
 
 
-class HeadHunterAPI(Parser):
+class HeadHunterAPI(ParserAPI):
     """
     Класс для работы с API HeadHunter
     """
@@ -17,22 +20,14 @@ class HeadHunterAPI(Parser):
         super().__init__()
 
     def __get_connect(self):
-        """Метод подключения к API"""
+        """Метод проверки подключения к API"""
         try:
             response = requests.get(self.__url)
-            status_code = response.status_code
             response.raise_for_status()
-
+            return True
         except requests.exceptions.RequestException as e:
             print(f"Ошибка подключения: {e}")
             return False
-        else:
-            if status_code == 200:
-                return True
-
-    @property
-    def get_connect(self):
-        return HeadHunterAPI.__get_connect(self)
 
     @property
     def vacancies(self):
@@ -43,18 +38,12 @@ class HeadHunterAPI(Parser):
         if not self.__get_connect():
             return []
         self.__params['text'] = keyword
-        self.__params['page'] = 0
-        while True:
+
+        while self.__params.get('page') != 2:
             try:
                 response = requests.get(self.__url, headers=self.__headers, params=self.__params)
                 response.raise_for_status()
-                data = response.json()
                 vacancies = response.json()['items']
-                current_page = data['page']
-                total_pages = data['pages']
-                if  current_page >= total_pages - 1:
-                    break
-
                 self.__vacancies.extend(vacancies)
                 self.__params['page'] += 1
             except requests.exceptions.RequestException as e:
@@ -65,6 +54,12 @@ class HeadHunterAPI(Parser):
 
 
 hh_api = HeadHunterAPI()
-print(hh_api.get_connect)
-hh_vacancies = hh_api.load_vacancies("Python")
+hh_vacancies = hh_api.load_vacancies("python разработчик")
 print(hh_vacancies)
+# json_str = json.dumps(hh_vacancies, ensure_ascii=False, indent=2)
+# print(json_str)
+# vacancies = []
+# for vacancy in hh_vacancies:
+#     vacancy_ = Vacancy(vacancy)
+#     vacancies.append(vacancy_)
+# print(vacancies)
