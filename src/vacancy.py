@@ -25,15 +25,19 @@ class Vacancy:
         if data["salary"]["to"] is None and data["salary"]["from"] is None:
             self.salary_to, self.salary_from = 0, 0
         self.salary_currency = data["salary"]["currency"]
-        if data["salary"]["currency"] != "RUR":
-            self.salary_from = round(self.salary_from * get_external_rate(self.salary_currency))
-            self.salary_to = round(self.salary_to * get_external_rate(self.salary_currency))
-            self.salary_currency = "RUR"
-        self.requirements = data["snippet"]["requirement"].replace("highlighttext>", "").replace("</", ">")
+        # if data["salary"]["currency"] != "RUR":
+        #     self.salary_from = round(self.salary_from * get_external_rate(self.salary_currency))
+        #     self.salary_to = round(self.salary_to * get_external_rate(self.salary_currency))
+        #     self.salary_currency = "RUR"
+        # if "highlighttext>" in data["snippet"]["requirement"] and "</" in data["snippet"]["requirement"]:
+        #     self.requirements = data["snippet"]["requirement"].replace("highlighttext>", "").replace("</", ">")
+        # else:
+        self.requirements = data["snippet"]["requirement"]
         self.type_vacancy: str = data["type"]["name"]
         self.date_published: str = data["published_at"]
         self.work_format: str = data["employment_form"]["name"]
         self.experience: str = data["experience"]["name"]
+        super().__init__()
 
     def __repr__(self):
         """"""

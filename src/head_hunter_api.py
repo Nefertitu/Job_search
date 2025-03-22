@@ -1,3 +1,5 @@
+import json
+
 import requests
 
 from src.json_handler import JsonHandler
@@ -62,24 +64,49 @@ hh_vacancies = [{'id': '118551094', 'premium': False, 'name': 'Junior backend-р
 vacancies = []
 selected_vacancies = []
 for vacancy in hh_vacancies:
-    vacancy_ = Vacancy(vacancy)
     # print(repr(vacancy_))
-    vacancies.append(vacancy_)
+    vacancies.append(Vacancy(vacancy))
     # print(vacancy_)
 # print(vacancies)
-# json_save = JsonHandler(vacancies)
-# json_save.add_data()
+
+
 for vacancy in vacancies:
     if vacancy.get_vacancies_by_salary("20000 - 80000"):
+        # vacancy_ = Vacancy(vacancy)
         selected_vacancies.append(vacancy)
     else:
         continue
-
 # print(selected_vacancies)
+json_save = JsonHandler()
+# with JsonHandler(vacancies, 'w') as file:  # открываем файл в режиме записи ('w')
+#     json.dump(hh_vacancies, file, ensure_ascii=False, indent=4) # сериализуем данные в JSON и записываем в файл
+data = {
+                "id": '1111111',
+                "name": 'backend/frontend/mobile',
+                "area": {"name": 'Москва'},
+                "employer": {"name": 'Test'},
+                "alternate_url": 'sample_url',
+                "salary": {"from": 100000, "to": 120000, "currency": 'RUR'},
+                "snippet": {"requirement": 'Высшее техническое образование. Знание языка программирования <Python>'},
+                "type": {"name": 'Открытая'},
+                "published_at": '2024-03-20T17:52:03+0300',
+                "employment_form": {"name": 'Полная'},
+                "experience": {"name": 'От 1 года до 3 лет'},
+            }
+vacancy_1 = Vacancy(data)
+# print(repr(vacancy_1))
+json_save.add_data(vacancy_1)
+for selected_vacancy in selected_vacancies:
+    print(type(selected_vacancy))
+    json_save.add_data(selected_vacancy)
+
+print(selected_vacancies)
+print(type(selected_vacancies))
 filter_vacancies = filter_vacancies(vacancies, "python, москва")
-print(filter_vacancies)
+# print(filter_vacancies)
 print(vacancies[0] <= vacancies[-1])
 # sort_vacancies = sort_vacancies(vacancies)
 # print(sort_vacancies)
 # top_n_vacancies = get_top_vacancies(sort_vacancies, 3)
 # print(top_n_vacancies)
+

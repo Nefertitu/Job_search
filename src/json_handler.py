@@ -2,6 +2,7 @@ import json
 from json import JSONDecodeError
 
 from src.base_file_handler import BaseFileHandler
+from src.vacancy import Vacancy
 
 
 class JsonHandler(BaseFileHandler):
@@ -14,14 +15,14 @@ class JsonHandler(BaseFileHandler):
         self.__file: str = "../data/vacancies_save.json"
         super().__init__()
 
-    # def __enter__(self):
-    #     """Метод для входа в контекстный менеджер"""
-    #     self.fp = open(self.__file, self.mode)
-    #     return self.fp
-    #
-    # def __exit__(self, exc_type, exc_val, exc_tb):
-    #     """Метод для выхода из контекстного менеджера"""
-    #     self.fp.close()
+    def __enter__(self):
+        """Метод для входа в контекстный менеджер"""
+        self.fp = open(self.__file, self.mode, encoding="utf-8")
+        return self.fp
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Метод для выхода из контекстного менеджера"""
+        self.fp.close()
 
     # def read(self):
     #     if self.__file:
@@ -36,53 +37,55 @@ class JsonHandler(BaseFileHandler):
         return "Файл не найден."
 
 
-    def add_data(self):
+    def add_data(self, vacancy):
         """Метод для записи данных в JSON-файл"""
 
         vacancies = []
-
-        for vacancy in self.data:
-            data = {vacancy.id_vacancy:
-                {
-                    "name": vacancy.name_vacancy,
-                    "area": vacancy.area,
-                    "employer": vacancy.company,
-                    "url": vacancy.url_vacancy,
-                    "salary": f"от {vacancy.salary_from} до {vacancy.salary_to} {vacancy.salary_currency}",
-                    "requirement": vacancy.requirements,
-                    "published_at": vacancy.date_published,
-                    "employment_form": vacancy.work_format,
-                    "experience": vacancy.experience
-                }
+        data = {vacancy.id_vacancy:
+            {
+                "name": vacancy.name_vacancy,
+                "area": vacancy.area,
+                "employer": vacancy.company,
+                "url": vacancy.url_vacancy,
+                "salary": f"от {vacancy.salary_from} до {vacancy.salary_to} {vacancy.salary_currency}",
+                "requirement": vacancy.requirements,
+                "published_at": vacancy.date_published,
+                "employment_form": vacancy.work_format,
+                "experience": vacancy.experience
             }
-
-            vacancies.append(data)
+        }
 
         try:
             with open(self.__file, mode='r', encoding='utf-8') as f:
                 file_vacancies = json.load(f)
         except JSONDecodeError as e:
-            print("")
-
+            print(f"Ошибка: {e}")
+            vacancies.append(data)
             with open(self.__file, self.mode, encoding='utf-8') as f:
                 json.dump(vacancies, f, ensure_ascii=False, indent=4)
 
         else:
+            vacancies = []
+            file_vacancies_id = []
 
-                vacancies_keys = []
+            for file_vacancy in file_vacancies:
+                print(file_vacancy)
+                print(type(file_vacancy))
+                if list(file_vacancy.keys())[0] not in file_vacancies_id:
+                    file_vacancies_id.append(list(file_vacancy.keys())[0])
+                    vacancies.append(file_vacancy)
+                else:
+                    continue
 
-                for file_vacancy in file_vacancies:
-                    vacancies_keys.append(file_vacancy.keys())
+            if vacancy.id_vacancy in file_vacancies_id:
+                print(vacancy.id_vacancy)
 
-                for vacancy in vacancies:
+                with open(self.__file, self.mode, encoding='utf-8') as f:
+                    json.dump(vacancies, f, ensure_ascii=False, indent=4)
 
-                    if vacancy.keys() not in vacancies_keys:
-                        print(vacancy.keys())
-                        vacancies.append(vacancy)
-                    else:
-                        print(f"keys = {vacancy.keys()}")
-                        continue
-
+            else:
+                # print(file_vacancies)
+                vacancies.append(data)
                 with open(self.__file, self.mode, encoding='utf-8') as f:
                     json.dump(vacancies, f, ensure_ascii=False, indent=4)
 

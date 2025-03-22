@@ -7,7 +7,7 @@ class BaseFileHandler(ABC):
         super().__init__()
 
     @abstractmethod
-    def add_data(self):
+    def add_data(self, **kwargs):
         """Метод для записи данных в файл"""
         pass
 

@@ -1,7 +1,8 @@
 import re
-from itertools import count
 
 import requests
+
+# from src.head_hunter_api import HeadHunterAPI
 
 
 def get_external_rate(currency_name):
@@ -48,3 +49,33 @@ def get_top_vacancies(vacancies: list, top_n: int) -> list:
         return vacancies[: top_n]
 
     return vacancies
+
+
+# def user_interaction():
+#     """Функция для взаимодействия с пользователем"""
+#
+#     platforms = ["HeadHunter"]
+#
+#     hh_api = HeadHunterAPI()
+#
+#     search_query = input("Введите поисковый запрос: ")
+#     hh_vacancies = hh_api.load_vacancies(search_query)
+#
+#     filter_words = input("Введите ключевые слова для фильтрации вакансий: ")
+#     filtered_vacancies = filter_vacancies(hh_vacancies, filter_words)
+#
+#     salary_range = input("Введите диапазон зарплат (Пример: 100000 - 150000): ")  # Пример: 100000 - 150000
+#
+#     ranged_vacancies = []
+#     for vacancy in filtered_vacancies:
+#         if vacancy.get_vacancies_by_salary(salary_range):
+#             ranged_vacancies.append(vacancy)
+#         else:
+#             continue
+#
+#     sorted_vacancies = sort_vacancies(ranged_vacancies)
+#
+#     top_n = int(input("Введите количество вакансий для вывода в топ N: "))
+#     top_vacancies = get_top_vacancies(sorted_vacancies, top_n)
+#
+#     return top_vacancies
