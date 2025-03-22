@@ -37,8 +37,8 @@ class JsonHandler(BaseFileHandler):
         return "Файл не найден."
 
 
-    def add_data(self, vacancy):
-        """Метод для записи данных в JSON-файл"""
+    def add_vacancy(self, vacancy):
+        """Метод для добавления данных в JSON-файл"""
 
         vacancies = []
         data = {vacancy.id_vacancy:
@@ -59,18 +59,15 @@ class JsonHandler(BaseFileHandler):
             with open(self.__file, mode='r', encoding='utf-8') as f:
                 file_vacancies = json.load(f)
         except JSONDecodeError as e:
-            print(f"Ошибка: {e}")
+            print("")
             vacancies.append(data)
             with open(self.__file, self.mode, encoding='utf-8') as f:
                 json.dump(vacancies, f, ensure_ascii=False, indent=4)
 
         else:
-            vacancies = []
             file_vacancies_id = []
 
             for file_vacancy in file_vacancies:
-                print(file_vacancy)
-                print(type(file_vacancy))
                 if list(file_vacancy.keys())[0] not in file_vacancies_id:
                     file_vacancies_id.append(list(file_vacancy.keys())[0])
                     vacancies.append(file_vacancy)
@@ -78,16 +75,26 @@ class JsonHandler(BaseFileHandler):
                     continue
 
             if vacancy.id_vacancy in file_vacancies_id:
-                print(vacancy.id_vacancy)
-
                 with open(self.__file, self.mode, encoding='utf-8') as f:
                     json.dump(vacancies, f, ensure_ascii=False, indent=4)
 
             else:
-                # print(file_vacancies)
                 vacancies.append(data)
                 with open(self.__file, self.mode, encoding='utf-8') as f:
                     json.dump(vacancies, f, ensure_ascii=False, indent=4)
 
+    def delete_vacancy(self, vacancy):
+        """Метод для удаления данных из JSON-файла"""
+
+        try:
+            with open(self.__file, mode='r', encoding='utf-8') as f:
+                file_vacancies = json.load(f)
+        except JSONDecodeError as e:
+            print(f"Ошибка при попытке чтения файла: {e}")
+
+        else:
+            difference_vacancies = list(set(file_vacancies) - set(vacancy))
+            with open(self.__file, self.mode, encoding='utf-8') as f:
+                json.dump(difference_vacancies, f, ensure_ascii=False, indent=4)
 
 

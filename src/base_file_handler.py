@@ -7,11 +7,11 @@ class BaseFileHandler(ABC):
         super().__init__()
 
     @abstractmethod
-    def add_data(self, **kwargs):
+    def add_vacancy(self, **kwargs):
         """Метод для записи данных в файл"""
         pass
 
-    # @abstractmethod
-    # def del_data(self):
-    #     """Метод для удаления данных из файла"""
-    #     pass
+    @abstractmethod
+    def delete_vacancy(self, **kwargs):
+        """Метод для удаления данных из файла"""
+        pass

@@ -78,6 +78,7 @@ for vacancy in vacancies:
         continue
 # print(selected_vacancies)
 json_save = JsonHandler()
+# print(dir(json_save))
 # with JsonHandler(vacancies, 'w') as file:  # открываем файл в режиме записи ('w')
 #     json.dump(hh_vacancies, file, ensure_ascii=False, indent=4) # сериализуем данные в JSON и записываем в файл
 data = {
@@ -95,10 +96,10 @@ data = {
             }
 vacancy_1 = Vacancy(data)
 # print(repr(vacancy_1))
-json_save.add_data(vacancy_1)
+json_save.add_vacancy(vacancy_1)
 for selected_vacancy in selected_vacancies:
     print(type(selected_vacancy))
-    json_save.add_data(selected_vacancy)
+    json_save.add_vacancy(selected_vacancy)
 
 print(selected_vacancies)
 print(type(selected_vacancies))
@@ -109,4 +110,6 @@ print(vacancies[0] <= vacancies[-1])
 # print(sort_vacancies)
 # top_n_vacancies = get_top_vacancies(sort_vacancies, 3)
 # print(top_n_vacancies)
+print()
+print(list(set(selected_vacancies) - set(selected_vacancies[:2])))
 
