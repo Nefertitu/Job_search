@@ -2,7 +2,6 @@ import json
 from json import JSONDecodeError
 
 from src.base_file_handler import BaseFileHandler
-from src.vacancy import Vacancy
 
 
 class JsonHandler(BaseFileHandler):
@@ -12,7 +11,7 @@ class JsonHandler(BaseFileHandler):
         """Конструктор для экземпляра класса `JsonProcessor`"""
         self.data = data
         self.mode: str = mode
-        self.__file: str = "../data/vacancies_save.json"
+        self.__file: str = "./data/vacancies_save.json"
         super().__init__()
 
     def __enter__(self):
@@ -24,9 +23,11 @@ class JsonHandler(BaseFileHandler):
         """Метод для выхода из контекстного менеджера"""
         self.fp.close()
 
-    # def read(self):
-    #     if self.__file:
-    #         return self.fp
+    def read(self):
+        with open(self.__file, mode='r', encoding='utf-8') as f:
+            read_json = json.load(f)
+            # dict_vacancies = json.dumps(read_json, ensure_ascii=False, indent=4)
+            return read_json
 
     def get_data(self):
         """Метод для получения данных из JSON-файла"""
@@ -49,6 +50,7 @@ class JsonHandler(BaseFileHandler):
                 "url": vacancy.url_vacancy,
                 "salary": f"от {vacancy.salary_from} до {vacancy.salary_to} {vacancy.salary_currency}",
                 "requirement": vacancy.requirements,
+                "status": vacancy.status,
                 "published_at": vacancy.date_published,
                 "employment_form": vacancy.work_format,
                 "experience": vacancy.experience
@@ -93,8 +95,9 @@ class JsonHandler(BaseFileHandler):
             print(f"Ошибка при попытке чтения файла: {e}")
 
         else:
-            difference_vacancies = list(set(file_vacancies) - set(vacancy))
+            new_data = [dict for dict in file_vacancies if list(dict.keys())[0] != vacancy.id_vacancy]
+
             with open(self.__file, self.mode, encoding='utf-8') as f:
-                json.dump(difference_vacancies, f, ensure_ascii=False, indent=4)
+                json.dump(new_data, f, ensure_ascii=False, indent=4)
 
 

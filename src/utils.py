@@ -1,27 +1,11 @@
 import re
 
-import requests
-
 from src.head_hunter_api import HeadHunterAPI
 from src.json_handler import JsonHandler
 from src.vacancy import Vacancy
 
 
-def get_external_rate(currency_name):
-    """Функция для получения текущего курса валют"""
-
-    url = "https://www.cbr-xml-daily.ru/daily_json.js"
-
-    response = requests.get(url)
-    data_currency = response.json()["Valute"][currency_name]["Value"]
-
-    return data_currency
-
-
-# print(get_external_rate("USD"))
-
-
-def filter_vacancies(vacancies: list, filter_words: str) -> list:
+def filter_vacancies(vacancies: list, filter_words: str, param: str = "positive") -> str | list:
     """Функция для выбора вакансий по ключевым словам"""
 
     vacancies_filter =[]
@@ -29,10 +13,20 @@ def filter_vacancies(vacancies: list, filter_words: str) -> list:
     list_words = re.findall(r"([\w]{3,})", filter_words.lower())
 
     for vacancy in vacancies:
-        if set(list_words).issubset(set(re.findall(r"(\w{3,})", f"{vacancy.name_vacancy} {vacancy.area} {vacancy.requirements}".lower()))):
-            vacancies_filter.append(vacancy)
-        else:
-            continue
+        vacancy = Vacancy(vacancy)
+        if param == "positive":
+            if set(list_words).issubset(set(re.findall(r"(\w{3,})", f"{vacancy.name_vacancy} {vacancy.area} {vacancy.requirements}".lower()))):
+                vacancies_filter.append(vacancy)
+            else:
+                continue
+        if param == "negative":
+            if set(list_words).issubset(set(re.findall(r"(\w{3,})", f"{vacancy.name_vacancy} {vacancy.area} {vacancy.requirements}".lower()))):
+                continue
+            else:
+                vacancies_filter.append(vacancy)
+
+    if vacancies_filter is None:
+        return []
 
     return vacancies_filter
 
@@ -46,11 +40,10 @@ def sort_vacancies(vacancies: list) -> list:
 def get_top_vacancies(vacancies: list, top_n: int) -> list:
     """Функция для выбора топ N вакансий"""
 
-    if len(vacancies) <= top_n:
-
-        return vacancies[: top_n]
-
-    return vacancies
+    if len(vacancies) >= top_n:
+        return vacancies[:top_n]
+    else:
+        return vacancies
 
 
 def user_interaction():
@@ -60,49 +53,69 @@ def user_interaction():
     vacancies_save = []
     hh_api = HeadHunterAPI()
 
-    search_query = input(f"\nВведите данные для выполнения поискового запроса о вакансиях на платформе {platform}: ")
+    search_query = input(
+        f"\nВведите данные для выполнения поискового запроса о вакансиях на платформе {platform}: ")
+    with open("./data/vacancies_save.json", "w") as f:
+        f.write("")
     hh_vacancies = hh_api.load_vacancies(search_query)
-
+    vacancies_list = Vacancy.cast_vacancies_in_list(hh_vacancies)
+    print("\nВыполняется запрос к API сайта hh.ru...")
     json_saver = JsonHandler()
-    for vacancy in hh_vacancies:
+    for vacancy in vacancies_list:
         vacancy_ = Vacancy(vacancy)
         vacancies_save.append(vacancy_)
         json_saver.add_vacancy(vacancy_)
 
-    print(f"\nВыполнена запись полученных данных в файл '../data/vacancies_save.json'")
+    print(f"\nПроизведена запись полученных данных в файл 'vacancies_save.json'.")
 
-    filter_words = input("""\nВведите ключевые слова для фильтрации вакансий
-    (пример: Москва, Junior): """)
-    filtered_vacancies = filter_vacancies(hh_vacancies, filter_words)
+    filter_words = input("""\nВведите ключевое слово (или список слов) для фильтрации вакансий
+(пример: Москва, Junior): """)
+    filtered_vacancies = filter_vacancies(vacancies_list, filter_words)
 
-    salary_range = input("\nВведите диапазон зарплат (пример: 100000 - 150000): ")  # Пример: 100000 - 150000
+    if filtered_vacancies is None:
+        return "\nПо заданным ключевым словам совпадений не найдено."
 
-    ranged_vacancies = []
-    for vacancy in filtered_vacancies:
-        if vacancy.get_vacancies_by_salary(salary_range):
-            ranged_vacancies.append(vacancy)
-        else:
-            continue
+    else:
+        print("\nВыполнен перерасчет заработной платы, указанной в другой валюте, в рубли с помощью API ЦБ РФ.")
+        salary_range = input("\nВведите диапазон зарплат (пример: 100000 - 150000): ")
 
-    answer_dif = input("\nЗаписать отфильтрованные данные по вакансиям? (Введите: да/нет): ")
+        ranged_vacancies = []
+        not_ranged_vacancies = []
+        for vacancy in filtered_vacancies:
+            if vacancy.get_vacancies_by_salary(salary_range):
+                ranged_vacancies.append(vacancy)
+            else:
+                not_ranged_vacancies.append(vacancy)
 
-    answers = ["да", "lf", "нет", "ytn"]
+        answer_dif = input("\nЗаписать отфильтрованные данные по вакансиям в файл 'vacancies_save.json'? (Введите: да/нет): ")
 
-    while answer_dif.lower() not in answers:
-        input("\nВведите 'да' или 'нет': ")
+        answers = ["да", "lf", "нет", "ytn"]
 
-    if answer_dif.lower() == "да" or answer_dif.lower() == "lf":
-        for vacancy in ranged_vacancies:
-            vacancy_ = Vacancy(vacancy)
-            json_saver.delete_vacancy(vacancy_)
-    if  answer_dif.lower() == "нет" or answer_dif.lower() == "ytn":
-        print("\nВ файле '../data/vacancies_save.json' остается полный перечень вакансий.")
+        while answer_dif.lower() not in answers:
+            input("\nВведите 'да' или 'нет': ")
 
-    sorted_vacancies = sort_vacancies(ranged_vacancies)
+        if answer_dif.lower() == "да" or answer_dif.lower() == "lf":
+            filtered_vacancies_negative = filter_vacancies(vacancies_list, filter_words, param="negative")
+            print("\nВыполняется запись данных в файл...")
+            vacancies_to_del = []
+            for vacancy in filtered_vacancies_negative:
+                # vacancy_ = Vacancy(vacancy)
+                vacancies_to_del.append(vacancy)
+            for vacancy in not_ranged_vacancies:
+                vacancies_to_del.append(vacancy)
+            for vacancy in vacancies_to_del:
+                json_saver.delete_vacancy(vacancy)
 
-    print(f"\nОбщее количество вакансий, полученных после фильтрации, составляет {len(ranged_vacancies)} шт.")
+        if answer_dif.lower() == "нет" or answer_dif.lower() == "ytn":
+            print("\nВ файле 'vacancies_save.json' остается полный перечень вакансий.")
 
-    top_n = int(input("\nВведите количество вакансий для вывода в топ N: "))
-    top_vacancies = get_top_vacancies(sorted_vacancies, top_n)
+        sorted_vacancies = sort_vacancies(ranged_vacancies)
 
-    return top_vacancies
+        print(f"\nОбщее количество вакансий, полученных после фильтрации, составляет {len(sorted_vacancies)} шт.")
+
+        top_n = int(input("\nВведите количество вакансий для вывода в топ N: "))
+        top_vacancies = get_top_vacancies(sorted_vacancies, top_n)
+
+        return top_vacancies
+
+

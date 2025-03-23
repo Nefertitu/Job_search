@@ -1,16 +1,19 @@
 import re
 from typing import Any
 
-from src.utils import get_external_rate
+from src.external_api import get_external_rate
 
 
 class Vacancy:
     """Класс для работы с вакансиями"""
-    __slots__ = ("id_vacancy", "name_vacancy", "area", "company", "url_vacancy", "salary_from", "salary_to", "salary_currency", "requirements", "type_vacancy", "date_published", "work_format", "experience")
+
+    __slots__ = ("id_vacancy", "name_vacancy", "area", "company", "url_vacancy", "salary_from", "salary_to", "salary_currency", "requirements", "status", "date_published", "work_format", "experience")
     vacancies = []
+
     def __init__(self, data):
         """Конструктор для создания экземпляра класса `Vacancy`"""
-        self.__validate_data(data)
+        if not self.__validate_data(data):
+            raise ValueError("Invalid vacancy data")
         self.id_vacancy: str = data["id"]
         self.name_vacancy: str = data["name"]
         self.area: str = data["area"]["name"]
@@ -29,11 +32,9 @@ class Vacancy:
             self.salary_from = round(self.salary_from * get_external_rate(self.salary_currency))
             self.salary_to = round(self.salary_to * get_external_rate(self.salary_currency))
             self.salary_currency = "RUR"
-        if "highlighttext>" in data["snippet"]["requirement"] and "</" in data["snippet"]["requirement"]:
-            self.requirements = data["snippet"]["requirement"].replace("highlighttext>", "").replace("</", ">")
-        else:
-            self.requirements = data["snippet"]["requirement"]
-        self.type_vacancy: str = data["type"]["name"]
+        requirement = data.get("snippet", {}).get("requirement")
+        self.requirements: str = re.sub(r'<highlighttext>(.\w*)</highlighttext>', r'\1', requirement) if requirement else ""
+        self.status: str = data["type"]["name"]
         self.date_published: str = data["published_at"]
         self.work_format: str = data["employment_form"]["name"]
         self.experience: str = data["experience"]["name"]
@@ -50,7 +51,7 @@ class Vacancy:
         url='{self.url_vacancy}', 
         salary='от {self.salary_from} до {self.salary_to} {self.salary_currency}', 
         requirements='{self.requirements}', 
-        type='{self.type_vacancy}', 
+        status='{self.status}', 
         published_at='{self.date_published}', 
         employment_form='{self.work_format}', 
         experience='{self.experience}'
@@ -60,25 +61,30 @@ class Vacancy:
         """Строковое отображение экземпляра класса `Vacancy`"""
 
         if self.salary_to == 0 and self.salary_from == 0:
-            return (f"Наименование вакансии - {self.name_vacancy}, "
-                    f"месторасположение - {self.area}, "
-                    f"работодатель - {self.company}, "
-                    f"url-адрес вакансии на сайте hh.ru - {self.url_vacancy}, "
-                    f"заработная плата - не указана, "
-                    f"требования - {self.requirements}, "
-                    f"дата публикации вакансии - {self.date_published}, "
-                    f"форма трудоустройства - {self.work_format}, "
-                    f"опыт работы - {self.experience}")
+            return (f"""
+            Наименование вакансии - {self.name_vacancy},
+            месторасположение - {self.area},
+            работодатель - {self.company},
+            url-адрес вакансии на сайте hh.ru - {self.url_vacancy},
+            заработная плата - не указана,
+            требования - {self.requirements},
+            статус вакансии - {self.status},
+            форма трудоустройства - {self.work_format},
+            опыт работы - {self.experience}
+""")
         else:
-            return (f"Наименование вакансии - {self.name_vacancy}, "
-                    f"месторасположение - {self.area}, "
-                    f"работодатель - {self.company}, "
-                    f"url-адрес вакансии на сайте hh.ru - {self.url_vacancy}, "
-                    f"заработная плата - от {self.salary_from} до {self.salary_to} {self.salary_currency}, "
-                    f"требования - {self.requirements}, "
-                    f"дата публикации вакансии - {self.date_published}, "
-                    f"форма трудоустройства - {self.work_format}, "
-                    f"опыт работы - {self.experience}")
+            return (f"""
+            Наименование вакансии - {self.name_vacancy},
+            месторасположение - {self.area},
+            работодатель - {self.company},
+            url-адрес вакансии на сайте hh.ru - {self.url_vacancy},
+            заработная плата - от {self.salary_from} до {self.salary_to} {self.salary_currency},
+            требования - {self.requirements},
+            статус вакансии - {self.status},
+            дата публикации вакансии - {self.date_published},
+            форма трудоустройства - {self.work_format},
+            опыт работы - {self.experience}
+""")
 
     def __validate_data(self, data):
         """Метод валидации загруженных данных о вакансиях"""
@@ -89,21 +95,31 @@ class Vacancy:
                     continue
                 if not all(key in self for key in
                            ["name_vacancy", "area", "company", "url_vacancy", "salary_from", "salary_to",
-                            "salary_currency", "requirements", "type_vacancy", "date_published", "work_format", "experience"]):
+                            "salary_currency", "requirements", "status", "date_published", "work_format", "experience"]):
                     continue
 
             except Exception as e:
                 print(f"{e}")
 
-            else:
-                self.vacancies.append(vacancy)
-
-        return self.vacancies
+        else:
+            return True
 
     @property
     def validate_data(self):
         """Метод возвращает значение данных о вакансиях, прошедших валидацию"""
+
         return self.__validate_data
+
+    @classmethod
+    def cast_vacancies_in_list(cls, vacancies_data: list) -> list:
+        """Метод возвращает список вакансий"""
+
+        try:
+            vacancies_objects = [vacancy for vacancy in vacancies_data]
+        except ValueError as e:
+            print(f"Ошибка при создании вакансии: {e}")
+            return []
+        return vacancies_objects
 
     def __le__(self, other):
         """Метод сравнения зарплат - меньше или равно"""
@@ -115,6 +131,13 @@ class Vacancy:
         if isinstance(other, Vacancy):
             return int(self.salary_to) >= int(other.salary_to)
 
+    def __len__(self):
+        """Метод для подсчета количества экземпляров
+        класса `Vacancy` в списке"""
+
+        if self.vacancies:
+            return len(self.vacancies)
+
     def get_vacancies_by_salary(self, salary_range: str) -> Any:
         """Метод для поиска вакансий с заданным диапазоном заработной платы"""
 
@@ -124,5 +147,6 @@ class Vacancy:
         if min_salary <= self.salary_to <= max_salary:
             return True
         return False
+
 
 

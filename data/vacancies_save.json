@@ -1,67 +1,114 @@
 [
     {
-        "1111111": {
-            "name": "backend/frontend/mobile",
-            "area": "Москва",
-            "employer": "Test",
-            "url": "sample_url",
-            "salary": "от 100000 до 120000 RUR",
-            "requirement": "Высшее техническое образование. Знание языка программирования <Python>",
-            "published_at": "2024-03-20T17:52:03+0300",
-            "employment_form": "Полная",
-            "experience": "От 1 года до 3 лет"
-        }
-    },
-    {
-        "118551094": {
-            "name": "Junior backend-разработчик",
-            "area": "Рязань",
-            "employer": "enKod",
-            "url": "https://hh.ru/vacancy/118551094",
-            "salary": "от 40000 до 40000 RUR",
-            "requirement": "Опыт работы с Go. Пройденный GoTour. Работа с git. Примеры проектов. Опыт создания HTTP-сервисов.",
-            "published_at": "2025-03-19T12:20:57+0300",
-            "employment_form": "Полная",
-            "experience": "Нет опыта"
-        }
-    },
-    {
-        "118263819": {
-            "name": "Программист (Junior - младший разработчик)",
+        "118508052": {
+            "name": "QA тестировщик",
             "area": "Санкт-Петербург",
-            "employer": "ПТМК",
-            "url": "https://hh.ru/vacancy/118263819",
-            "salary": "от 50000 до 70000 RUR",
-            "requirement": "Знание одного из объектно-ориентированного языка программирования, к примеру: C++\\C#, Delphi, <highlighttext>Python</highlighttext>, Pascal, 1С. Знание работы с СУБД...",
-            "published_at": "2025-03-12T18:18:30+0300",
-            "employment_form": "Полная",
-            "experience": "Нет опыта"
-        }
-    },
-    {
-        "118524767": {
-            "name": "Python-разработчик (Django) Junior",
-            "area": "Москва",
-            "employer": "Саппи Аналитикс",
-            "url": "https://hh.ru/vacancy/118524767",
-            "salary": "от 60000 до 60000 RUR",
-            "requirement": "Высокая самостоятельность, готовность работать без постоянного присмотра наставником. Хорошее владение <highlighttext>Python</highlighttext> и умение оформлять код. Внимательность к деталям и ответственность. ",
-            "published_at": "2025-03-18T20:08:21+0300",
+            "employer": "Сотранс, группа компаний",
+            "url": "https://hh.ru/vacancy/118508052",
+            "salary": "от 80000 до 150000 RUR",
+            "requirement": "Знание языков программирования для автоматизации (например, Java, Python, JavaScript). Опыт работы с системами управления тестированием. Понимание основ работы веб-технологий...",
+            "status": "Открытая",
+            "published_at": "2025-03-18T14:35:26+0300",
             "employment_form": "Полная",
             "experience": "От 1 года до 3 лет"
         }
     },
     {
-        "110412718": {
-            "name": "Junior Python Developer",
-            "area": "Таганрог",
-            "employer": "JavaCode",
-            "url": "https://hh.ru/vacancy/110412718",
-            "salary": "от 75000 до 75000 RUR",
-            "requirement": "Базовые знания <highlighttext>Python</highlighttext>. Опыт написания REST приложений на любом <highlighttext>Python</highlighttext> фреймворке (Flask, FastAPI, Django и др.). Понимание основ SQL и...",
-            "published_at": "2025-03-06T19:57:18+0300",
+        "118071497": {
+            "name": "Менеджер по продажам EDTECH",
+            "area": "Санкт-Петербург",
+            "employer": "Технолиум",
+            "url": "https://hh.ru/vacancy/118071497",
+            "salary": "от 70000 до 180000 RUR",
+            "requirement": "Опыт в продажах (желательно в онлайн-образовании) от 1 года. Успешный опыт проведения видеовстреч и продаж через Zoom. ",
+            "status": "Открытая",
+            "published_at": "2025-03-07T12:06:21+0300",
+            "employment_form": "Полная",
+            "experience": "От 1 года до 3 лет"
+        }
+    },
+    {
+        "118183702": {
+            "name": "Backend Python Developer Junior+",
+            "area": "Санкт-Петербург",
+            "employer": "InCodeWeTrust",
+            "url": "https://hh.ru/vacancy/118183702",
+            "salary": "от 110000 до 150000 RUR",
+            "requirement": "Уровень Junior+. Уверенные знания Python 3.8+ (опыт коммерческой разработки от 1 года). Опыт работы с Flask или другим...",
+            "status": "Открытая",
+            "published_at": "2025-03-11T11:49:49+0300",
+            "employment_form": "Полная",
+            "experience": "От 1 года до 3 лет"
+        }
+    },
+    {
+        "118513596": {
+            "name": "Аналитик данных",
+            "area": "Санкт-Петербург",
+            "employer": "Леон",
+            "url": "https://hh.ru/vacancy/118513596",
+            "salary": "от 150000 до 150000 RUR",
+            "requirement": "Знание SQL и Python. Опыт работы с Appsflyer, Яндекс Метрикой и Google Analytics является плюсом. Опыт работы с аналитикой трафика...",
+            "status": "Открытая",
+            "published_at": "2025-03-18T15:59:21+0300",
+            "employment_form": "Полная",
+            "experience": "От 3 до 6 лет"
+        }
+    },
+    {
+        "118514301": {
+            "name": "Старший системный администратор (офис)",
+            "area": "Санкт-Петербург",
+            "employer": "TravelLine",
+            "url": "https://hh.ru/vacancy/118514301",
+            "salary": "от 230000 до 230000 RUR",
+            "requirement": "Ответственно относишься к своей работе — совсем не здóрово, если вечером произошел критический инцидент, а админ уходит домой, игнорируя ситуацию. ",
+            "status": "Открытая",
+            "published_at": "2025-03-21T16:13:05+0300",
+            "employment_form": "Полная",
+            "experience": "Более 6 лет"
+        }
+    },
+    {
+        "118074454": {
+            "name": "Инженер-программист",
+            "area": "Санкт-Петербург",
+            "employer": "Цифровая Сборка",
+            "url": "https://hh.ru/vacancy/118074454",
+            "salary": "от 45000 до 150000 RUR",
+            "requirement": "Умение писать код на C# / C++ / Python. Опыт работы с промышленной робототехникой. Опыт работы с КИПиА и ПЛК. ",
+            "status": "Открытая",
+            "published_at": "2025-03-07T13:09:47+0300",
             "employment_form": "Полная",
             "experience": "Нет опыта"
+        }
+    },
+    {
+        "117822018": {
+            "name": "Backend-разработчик",
+            "area": "Санкт-Петербург",
+            "employer": "Системы планирования производства и логистики",
+            "url": "https://hh.ru/vacancy/117822018",
+            "salary": "от 100000 до 170000 RUR",
+            "requirement": "",
+            "status": "Открытая",
+            "published_at": "2025-02-28T11:03:13+0300",
+            "employment_form": "Полная",
+            "experience": "От 1 года до 3 лет"
+        }
+    },
+    {
+        "118185331": {
+            "name": "DevOps Engineer",
+            "area": "Санкт-Петербург",
+            "employer": "TutorPlace",
+            "url": "https://hh.ru/vacancy/118185331",
+            "salary": "от 175000 до 300000 RUR",
+            "requirement": "Опыт работы с системами мониторинга (Zabbix, Prometheus, Grafana): настройка алертов, создание дашбордов. Знание Bash или Python для автоматизации и написания...",
+            "status": "Открытая",
+            "published_at": "2025-03-23T12:09:09+0300",
+            "employment_form": "Полная",
+            "experience": "От 1 года до 3 лет"
         }
     }
 ]
