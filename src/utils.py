@@ -13,7 +13,7 @@ def filter_vacancies(vacancies: list, filter_words: str, param: str = "positive"
     list_words = re.findall(r"([\w]{3,})", filter_words.lower())
 
     for vacancy in vacancies:
-        vacancy = Vacancy(vacancy)
+        # vacancy = Vacancy(vacancy)
         if param == "positive":
             if set(list_words).issubset(set(re.findall(r"(\w{3,})", f"{vacancy.name_vacancy} {vacancy.area} {vacancy.requirements}".lower()))):
                 vacancies_filter.append(vacancy)
@@ -59,22 +59,24 @@ def user_interaction():
         f.write("")
     hh_vacancies = hh_api.load_vacancies(search_query)
     vacancies_list = Vacancy.cast_vacancies_in_list(hh_vacancies)
+    print(vacancies_list)
     print("\nВыполняется запрос к API сайта hh.ru...")
     json_saver = JsonHandler()
     for vacancy in vacancies_list:
-        try:
-            vacancy_ = Vacancy(vacancy)
-        except TypeError as e:
-            continue
-        else:
-            vacancies_save.append(vacancy_)
-            json_saver.add_vacancy(vacancy_)
-
+        # try:
+        #     vacancy_ = Vacancy(vacancy)
+        # except TypeError as e:
+        #     continue
+        # else:
+        vacancies_save.append(vacancy)
+        json_saver.add_vacancy(vacancy)
+    print(vacancies_save)
     print(f"\nПроизведена запись полученных данных в файл 'vacancies_save.json'.")
 
     filter_words = input("""\nВведите ключевое слово (или список слов) для фильтрации вакансий
 (пример: Москва, Junior): """)
     filtered_vacancies = filter_vacancies(vacancies_list, filter_words)
+    print(filtered_vacancies)
 
     if filtered_vacancies is None:
         return "\nПо заданным ключевым словам совпадений не найдено."
