@@ -59,8 +59,8 @@ class HeadHunterAPI(ParserAPI):
 # vacancies = []
 # selected_vacancies = []
 # for vacancy in hh_vacancies:
-#     # print(repr(vacancy_))
-#     vacancies.append(Vacancy(vacancy))
+    # print(repr(vacancy_))
+    # vacancies.append(Vacancy(vacancy))
 #     # print(vacancy_)
 # # print(vacancies)
 #

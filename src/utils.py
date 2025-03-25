@@ -62,9 +62,13 @@ def user_interaction():
     print("\nВыполняется запрос к API сайта hh.ru...")
     json_saver = JsonHandler()
     for vacancy in vacancies_list:
-        vacancy_ = Vacancy(vacancy)
-        vacancies_save.append(vacancy_)
-        json_saver.add_vacancy(vacancy_)
+        try:
+            vacancy_ = Vacancy(vacancy)
+        except TypeError as e:
+            continue
+        else:
+            vacancies_save.append(vacancy_)
+            json_saver.add_vacancy(vacancy_)
 
     print(f"\nПроизведена запись полученных данных в файл 'vacancies_save.json'.")
 
