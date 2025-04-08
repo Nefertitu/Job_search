@@ -176,24 +176,6 @@ def test_vacancy_value_error(capsys) -> None:
         assert captured.out == "KeyError: 'area'"
 
 
-# def test_vacancy_len(data_1: dict, data_2: dict, data_4: dict) -> None:
-#     """
-#     Проверяет, что корректно осуществляется подсчет количества объектов
-#     `Vacancy` в списке вакансий
-#     :param data_1:
-#     :param data_2:
-#     :return:
-#     """
-#
-#     list_vacancies = [data_1, data_2]
-#
-#     assert (Vacancy.cast_vacancies_in_list(list_vacancies)).__len__() == 2
-#     list_empty = []
-#     assert (Vacancy.cast_vacancies_in_list(list_empty)).__len__() == 0
-#     list_vacancies_2 = [data_1, data_2, data_4]
-#     assert (Vacancy.cast_vacancies_in_list(list_vacancies_2)).__len__() == 3
-
-
 def test_vacancy_compars(vacancy_1: Vacancy, vacancy_2: Vacancy, vacancy_3: Vacancy, capsys) -> None:
     """
     Проверяет, что методы сравнения корректно сравнивают объекты `Vacancy`
@@ -363,14 +345,49 @@ def test_vacancy_repr(vacancy_1: Vacancy) -> None:
         )"""
 
 
-def test_vacancy_validate_data(data_1: dict, data_2: dict, data_3: dict, data_4: dict, capsys):
+def test_vacancy_validate_data_key_error(data_1: dict, data_3: dict, capsys):
     """Проверяет корректность работы метода валидации данных"""
 
     with pytest.raises(KeyError):
-        vacancy = Vacancy(data_3)
-        print(vacancy)
+        vacancy_1 = Vacancy(data_3)
+        print(vacancy_1)
         captured_1 = capsys.readouterr()
         assert captured_1.out == "Отсутствуют необходимые ключи - ['snippet', 'type', 'published_at', 'employment_form', 'experience']"
+
+    assert isinstance(data_1, dict) is True
+    vacancy_2 = Vacancy(data_1)
+    assert vacancy_2.__slots__ == ("id_vacancy", "name_vacancy", "area", "company",
+                                   "url_vacancy", "salary_from", "salary_to",
+                                   "salary_currency", "requirements", "status",
+                                   "date_published", "work_format", "experience")
+
+    right_len = len(data_1.keys())
+
+    data = {
+        "name": 'backend разработчик',
+        "area": {"name": 'Москва'},
+        "employer": {"name": 'Test_2'},
+        "alternate_url": 'https://example_url.com',
+        "salary": {"from": None, "to": 250000, "currency": 'RUR'},
+    }
+    assert "id" not in data.keys()
+
+    assert len(data.keys()) != right_len
+
+    # with pytest.raises(KeyError):
+    try:
+        vacancy_4 = Vacancy(data)
+        # print(vacancy_4)
+    except KeyError as e:
+        print(f"Возникла ошибка KeyError: {e}")
+    else:
+        print("Не возникла ошибка KeyError")
+    captured_3 = capsys.readouterr()
+    assert captured_3.out == 'Возникла ошибка KeyError: "Отсутствуют необходимые ключи - [\'id\']"\n'
+
+
+def test_vacancy_validate_data_type_error(data_3: dict, capsys):
+    """Проверяет работу метода валидации данных при возникновении `TypeError`"""
 
     with pytest.raises(TypeError):
         data = [data_3]
@@ -379,29 +396,8 @@ def test_vacancy_validate_data(data_1: dict, data_2: dict, data_3: dict, data_4:
         print(vacancy_2)
         captured_2 = capsys.readouterr()
         assert captured_2.out == "Ошибка: Данные должны быть словарем."
-    #
-    assert isinstance(data_1, dict) is True
-    vacancy_3 = Vacancy(data_1)
-    assert vacancy_3.__slots__ == ("id_vacancy", "name_vacancy", "area", "company",
-                                   "url_vacancy", "salary_from", "salary_to",
-                                   "salary_currency", "requirements", "status",
-                                   "date_published", "work_format",
-                                   "experience")
 
-    assert len(data_3.keys()) != len(["id", "name", "area", "employer",
-        "salary", "published_at", "type",
-        "employment_form", "experience"])
 
-    data_5 = {
-        "name": 'backend разработчик',
-        "area": {"name": 'Москва'},
-        "employer": {"name": 'Test_2'},
-        "alternate_url": 'https://example_url.com',
-        "salary": {"from": None, "to": 250000, "currency": 'RUR'},
-    }
-    assert "id" not in data_5.keys()
 
-    with pytest.raises(KeyError):
-       Vacancy(data_5)
 
 

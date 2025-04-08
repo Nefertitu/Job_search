@@ -1,6 +1,23 @@
+import logging
 import re
+from pathlib import Path
 
 from src.external_api import get_external_rate
+
+
+log_dir = Path(__file__).parent.parent / 'data'
+log_dir.mkdir(parents=True, exist_ok=True)
+log_file = str((log_dir / 'logging_reports.log').absolute().resolve()).replace("\\", "/")
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+shared_handler = logging.FileHandler(log_file, mode="a", encoding="utf-8")
+shared_handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(levelname)s | %(asctime)s | %(message)s | [%(filename)s:%(lineno)d]')
+shared_handler.setFormatter(formatter)
+shared_handler.setFormatter(formatter)
+logger.addHandler(shared_handler)
+logger.propagate = False
 
 
 class Vacancy:
@@ -89,6 +106,7 @@ class Vacancy:
         """Метод валидации загруженных данных о вакансиях"""
 
         if not isinstance(data, dict):
+            logger.error(f"Ошибка: данные должны быть словарем.")
             raise TypeError("Ошибка: данные должны быть словарем.")
 
         basic_keys = {
@@ -112,6 +130,7 @@ class Vacancy:
         missing_keys = [key for key in basic_keys.keys() if key not in data]
 
         if missing_keys or data["id"] is None:
+            logger.error(f"Отсутствуют необходимые ключи - {missing_keys}")
             raise KeyError(f"Отсутствуют необходимые ключи - {missing_keys}")
 
         # for first_key, second_keys in nested_keys:
@@ -140,6 +159,7 @@ class Vacancy:
         try:
             vacancies_objects = [cls(vacancy) for vacancy in vacancies_data]
         except KeyError as e:
+            logger.error(f"Ошибка в данных вакансии: {e}")
             raise ValueError(f"Ошибка в данных вакансии: {e}") from e
 
         return vacancies_objects

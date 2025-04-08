@@ -23,6 +23,7 @@ pandas-stubs = "^2.2.3.241126"
 pytest = "^8.3.4"
 pydantic = "^2.10.6"
 git-filter-repo = "^2.47.0"
+chardet = "^5.2.0"
 
 
 [tool.poetry.group.lint.dependencies]

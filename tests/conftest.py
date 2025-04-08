@@ -1,6 +1,6 @@
 import pytest
 
-from src.vacancy import Vacancy
+from src.vacancy import Vacancy, log_file
 
 
 @pytest.fixture
@@ -63,17 +63,17 @@ def vacancy_3() -> Vacancy:
 def data_1() -> dict:
     """Возвращает словарь с ключами для создания экземпляра класса `Vacancy`"""
     data = {
-        "id": '2222222',
-        "name": 'backend разработчик',
-        "area": {"name": 'Москва'},
-        "employer": {"name": 'Test_2'},
-        "alternate_url": 'https://example_url.com',
-        "salary": {"from": None, "to": 250000, "currency": 'RUR'},
+        "id": "2222222",
+        "name": "backend разработчик",
+        "area": {"name": "Москва"},
+        "employer": {"name": "Test_2"},
+        "alternate_url": "https://example_url.com",
+        "salary": {"from": None, "to": 250000, "currency": "RUR"},
         "snippet": {"requirement": 'Знание <Python>'},
-        "type": {"name": 'Открытая'},
-        "published_at": '2025-03-20T17:52:03+0300',
-        "employment_form": {"name": 'Полная'},
-        "experience": {"name": 'От 1 года до 3 лет'},
+        "type": {"name": "Открытая"},
+        "published_at": "2025-03-20T17:52:03+0300",
+        "employment_form": {"name": "Полная"},
+        "experience": {"name": "От 1 года до 3 лет"},
     }
     return data
 
@@ -125,4 +125,12 @@ def data_4() -> dict:
         "experience": {"name": 'От 1 года до 3 лет'},
     }
     return data
+
+
+@pytest.fixture(autouse=True)
+def clear_log():
+    """Фикстура для очистки лог-файла перед каждым тестом"""
+
+    open(log_file, "w", encoding="utf-8").close()
+
 
