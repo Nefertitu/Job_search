@@ -87,8 +87,8 @@ class JsonHandler(BaseFileHandler):
         try:
             with open(self.__file, mode='r', encoding='utf-8') as f:
                 file_vacancies = json.load(f)
-        except JSONDecodeError as e:
-            logger.error(f"Ошибка при попытке чтения файла: {e.__class__.__name__}.")
+        except JSONDecodeError:
+            logger.info("Попытка чтения файла - файл для записи вакансий пуст.")
             vacancies.append(data)
             with open(self.__file, self.mode, encoding='utf-8') as f:
                 json.dump(vacancies, f, ensure_ascii=False, indent=4)   # type: ignore

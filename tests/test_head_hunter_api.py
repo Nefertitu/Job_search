@@ -47,8 +47,8 @@ def test_hh_api_get_connect_success(mock_requests, capsys) -> None:
     assert vacancy_hh._HeadHunterAPI__get_connect() is True
 
     with open(log_file, 'r', encoding='utf-8') as file_logger:
-        logger_read = (file_logger.read().split(" | "))
-        assert "Соединение с API сайта: https://api.hh.ru/vacancies установлено успешно\n" in logger_read
+        logger_read = (file_logger.read().split(" | ")[-1])
+        assert 'Соединение с API сайта: https://api.hh.ru/vacancies установлено успешно.\n' in logger_read
 
 
 

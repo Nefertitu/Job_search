@@ -63,7 +63,7 @@ class HeadHunterAPI(ParserAPI):
             logger.error(f"Ошибка подключения: {err}")
             # print(f"Ошибка подключения: {err}")
             return False
-        logger.info(f"Соединение с API сайта: {self.__url} установлено успешно")
+        logger.info(f"Соединение с API сайта: 'https://api.hh.ru/' установлено успешно.")
         return True
 
     @property

@@ -47,6 +47,7 @@ class Vacancy:
             self.salary_from = round(self.salary_from * get_external_rate(self.salary_currency))
             self.salary_to = round(self.salary_to * get_external_rate(self.salary_currency))
             self.salary_currency = "RUR"
+            # logger.info("Выполнен перерасчет заработной платы, указанной не в рублях.")
         requirement = data["snippet"]["requirement"]
         self.requirements: str = re.sub(r'<highlighttext>(.\w*)</highlighttext>', r'\1', requirement) if requirement else ""
         self.status: str = data["type"]["name"]
@@ -56,7 +57,9 @@ class Vacancy:
         super().__init__()
 
     def __repr__(self) -> str:
-        """"""
+        """Возвращает однозначное строковое представление объекта класса `Vacancy`,
+        пригодное для отладки объекта."""
+
         return f"""
         Vacancy(
         id='{self.id_vacancy}', 
@@ -118,39 +121,15 @@ class Vacancy:
                 "employment_form", "experience"
                 }
         }
-        # nested_keys = {
-        #     "area": ["name"],
-        #     "employer": ["name"],
-        #     "salary": ["from", "to", "currency"],
-        #     "snippet": ["requirement"],
-        #     "type": ["name"],
-        #     "employment_form": ["name"],
-        #     "experience": ["name"]
-        # }
+
         missing_keys = [key for key in basic_keys.keys() if key not in data]
 
         if missing_keys or data["id"] is None:
             logger.error(f"Отсутствуют необходимые ключи - {missing_keys}")
             raise KeyError(f"Отсутствуют необходимые ключи - {missing_keys}")
 
-        # for first_key, second_keys in nested_keys:
-        #     if first_key not in data:
-        #         continue
-        #     if not isinstance(first_key, dict):
-        #         raise ValueError(f"Ключ '{first_key}' должен быть словарём")
-        #
-        #     missing_nested = [k for k in second_keys if k not in data[first_key]]
-        #     if missing_nested:
-        #         raise KeyError(f"В '{first_key}' отсутствуют ключи: {missing_nested}")
-
         else:
             return True
-
-    # @property
-    # def validate_data(self):
-    #     """Метод возвращает значение данных о вакансиях, прошедших валидацию"""
-    #
-    #     return self.__validate_data
 
     @classmethod
     def cast_vacancies_in_list(cls, vacancies_data: list) -> list:
@@ -183,25 +162,6 @@ class Vacancy:
         """Метод сравнения зарплат - больше"""
         if isinstance(other, Vacancy):
             return int(self.salary_to) > int(other.salary_to)
-
-    # def __eq__(self, other):
-    #     """Метод сравнения зарплат - больше"""
-    #     if isinstance(other, Vacancy):
-    #         return int(self.salary_to) == int(other.salary_to)
-    #
-    # def __ne__(self, other):
-    #     """Метод сравнения зарплат - больше"""
-    #     if isinstance(other, Vacancy):
-    #         return int(self.salary_to) != int(other.salary_to)
-
-    # def __len__(self) -> int:
-    #     """Метод для подсчета количества экземпляров
-    #     класса `Vacancy` в списке"""
-    #
-    #     if self.vacancies:
-    #         return len(self.vacancies)
-    #     else:
-    #         return 0
 
     def get_vacancies_by_salary(self, salary_range: str) -> bool:
         """Метод для поиска вакансий с заданным диапазоном заработной платы"""

@@ -8,11 +8,6 @@ class ParserAPI(ABC):
         """Конструктор для создания экземпляра класса `Parser`"""
         super().__init__()
 
-    # @abstractmethod
-    # def __get_connect(self):
-    #     """Метод подключения к API"""
-    #     pass
-
     @abstractmethod
     def load_vacancies(self, keyword: str):
         """Метод для получения вакансий"""

@@ -5,7 +5,6 @@ import logging
 from datetime import datetime
 from json import JSONDecodeError
 from pathlib import Path
-from time import strptime, strftime
 
 from src.head_hunter_api import HeadHunterAPI
 from src.json_handler import JsonHandler
@@ -15,6 +14,7 @@ from src.vacancy import Vacancy
 log_dir = Path(__file__).parent.parent / 'data'
 log_dir.mkdir(parents=True, exist_ok=True)
 log_file = str((log_dir / 'logging_reports.log').absolute().resolve()).replace("\\", "/")
+save_file_json = str((log_dir / 'vacancies_save.json').absolute().resolve()).replace("\\", "/")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -24,6 +24,7 @@ formatter = logging.Formatter('%(levelname)s | %(asctime)s | %(message)s')
 shared_handler.setFormatter(formatter)
 shared_handler.setFormatter(formatter)
 logger.addHandler(shared_handler)
+
 logger.propagate = False
 # print(f"Лог-файл: {log_file}")
 
@@ -33,24 +34,20 @@ def filter_vacancies(vacancies: list, filter_words: str, param: str = "positive"
 
     vacancies_filter =[]
 
-    list_words = re.findall(r"([\w]{3,})", filter_words.lower())
+    list_words = re.findall(r"(\b[\w]{3,}\b)+", filter_words.lower())
 
     for vacancy in vacancies:
-        # vacancy = Vacancy(vacancy)
         if param == "positive":
-            if set(list_words).issubset(set(re.findall(r"(\w{3,})", f"{vacancy.name_vacancy} {vacancy.area} {vacancy.requirements}".lower()))):
+            if set(list_words).issubset(set(re.findall(r"(\b[\w]{3,}\b)+", f"{vacancy.name_vacancy} {vacancy.area} {vacancy.requirements}".lower()))):
                 vacancies_filter.append(vacancy)
             else:
                 continue
+
         if param == "negative":
-            if set(list_words).issubset(set(re.findall(r"(\w{3,})", f"{vacancy.name_vacancy} {vacancy.area} {vacancy.requirements}".lower()))):
+            if set(list_words).issubset(set(re.findall(r"(\b[\w]{3,}\b)+", f"{vacancy.name_vacancy} {vacancy.area} {vacancy.requirements}".lower()))):
                 continue
             else:
                 vacancies_filter.append(vacancy)
-
-    if vacancies_filter is None:
-        return []
-
     return vacancies_filter
 
 
@@ -64,8 +61,10 @@ def get_top_vacancies(vacancies: list, top_n: int) -> list:
     """Функция для выбора топ N вакансий"""
 
     if len(vacancies) >= top_n:
+        logger.info(f"Получен список топ-{top_n} вакансий.")
         return vacancies[:top_n]
     else:
+        logger.info(f"Получен список из {len(vacancies)} вакансий.")
         return vacancies
 
 
@@ -80,21 +79,18 @@ def user_interaction():
         f"\nВведите данные для выполнения поискового запроса о вакансиях на платформе {platform}: ")
     print("\nВыполняется запрос к API сайта hh.ru...")
 
-    with open("./data/vacancies_save.json", "w") as f:
+    with open(save_file_json, "w", encoding="utf-8") as f:
         f.write("")
     hh_vacancies = hh_api.load_vacancies(search_query)
-    logger.info(f"Получены вакансии по ключевому слову: {search_query} в количестве {len(hh_vacancies)} шт.")
 
     vacancies_list = Vacancy.cast_vacancies_in_list(hh_vacancies)
+    logger.info(f"""Получены вакансии по ключевому слову: {search_query} в количестве {len(hh_vacancies)} шт.""")
+
     # print(vacancies_list)
+    # print("\nВыполнен перерасчет заработной платы, указанной в другой валюте, в рубли с помощью API ЦБ РФ.")
 
     json_saver = JsonHandler()
     for vacancy in vacancies_list:
-        # try:
-        #     vacancy_ = Vacancy(vacancy)
-        # except TypeError as e:
-        #     continue
-        # else:
         vacancies_save.append(vacancy)
         json_saver.add_vacancy(vacancy)
     # print(vacancies_save)
@@ -103,7 +99,8 @@ def user_interaction():
     filter_words = input("""\nВведите ключевое слово (или список слов) для фильтрации вакансий
 (пример: Москва, Junior): """)
     filtered_vacancies = filter_vacancies(vacancies_list, filter_words)
-    logger.info(f"Произведена фильтрация полученных вакансий по ключевому слову (словам): {filter_words},\nколичество полученных в результате фильтрации вакансий составило: {len(filtered_vacancies)} шт.")
+    logger.info(f"""Произведена фильтрация полученных вакансий по ключевому 
+слову (словам): '{filter_words}', количество полученных вакансий составило: {len(filtered_vacancies)} шт.""")
     # print(filtered_vacancies)
 
     if filtered_vacancies is None:
@@ -111,7 +108,6 @@ def user_interaction():
         return "\nПо заданным ключевым словам совпадений не найдено."
 
     else:
-        print("\nВыполнен перерасчет заработной платы, указанной в другой валюте, в рубли с помощью API ЦБ РФ.")
         salary_range = input("\nВведите диапазон зарплат (пример: 100000 - 150000): ")
 
         ranged_vacancies = []
@@ -121,7 +117,8 @@ def user_interaction():
                 ranged_vacancies.append(vacancy)
             else:
                 not_ranged_vacancies.append(vacancy)
-        logger.info(f"Вакансии отфильтрованы по установленному размеру заработной платы ({salary_range}),\nколичество полученных вакансий: {len(ranged_vacancies)} шт.")
+        logger.info(f"""Вакансии отфильтрованы по установленному размеру заработной 
+платы ({salary_range}), количество полученных вакансий: {len(ranged_vacancies)} шт.""")
 
         answer_dif = input(f"\nЗаписать отфильтрованные данные по вакансиям в файл 'vacancies_save.json'? (Введите: да/нет): ")
 
@@ -135,7 +132,6 @@ def user_interaction():
             print("\nВыполняется запись данных в файл...")
             vacancies_to_del = []
             for vacancy in filtered_vacancies_negative:
-                # vacancy_ = Vacancy(vacancy)
                 vacancies_to_del.append(vacancy)
             for vacancy in not_ranged_vacancies:
                 vacancies_to_del.append(vacancy)
@@ -150,7 +146,6 @@ def user_interaction():
 
         top_n = int(input("\nВведите количество вакансий для вывода в топ N: "))
         top_vacancies = get_top_vacancies(sorted_vacancies, top_n)
-        logging.info(f"Выведен в консоль список топ-{top_n} вакансий")
 
         return top_vacancies
 
@@ -202,8 +197,6 @@ def write_copy_file(filename: Path) -> bool:
     else:
         logger.info(f"Выполнена запись копии данных по вакансиям в файл: '{str((log_dir / 'logging_reports.log').absolute().resolve()).split("\\")[-1]}'")
         return True
-
-
 
 
 

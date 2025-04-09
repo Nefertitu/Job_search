@@ -1,5 +1,6 @@
 import requests
 
+
 def get_external_rate(currency_name):
     """Функция для получения текущего курса валют"""
 

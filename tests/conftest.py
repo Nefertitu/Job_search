@@ -127,6 +127,25 @@ def data_4() -> dict:
     return data
 
 
+@pytest.fixture
+def data_5() -> dict:
+    """Возвращает словарь с ключами для создания экземпляра класса `Vacancy`"""
+    data = {
+        "id": '2222222',
+        "name": 'Junior, backend разработчик',
+        "area": {"name": 'Санкт-Петербург'},
+        "employer": {"name": 'Test_3'},
+        "alternate_url": 'https://example_url.com',
+        "salary": {"from": 80000, "to": 120000, "currency": 'RUR'},
+        "snippet": {"requirement": 'Знание <Python>'},
+        "type": {"name": 'Открытая'},
+        "published_at": '2025-02-20T17:52:03+0300',
+        "employment_form": {"name": 'Полная'},
+        "experience": {"name": 'От 1 года до 3 лет'},
+    }
+    return data
+
+
 @pytest.fixture(autouse=True)
 def clear_log():
     """Фикстура для очистки лог-файла перед каждым тестом"""
