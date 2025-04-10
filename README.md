@@ -103,28 +103,28 @@ pytest --cov
 ```
 *Текущие результаты тестирования:*
 ```
-________ coverage: platform win32, python 3.13.1-final-0 ____________ 
+_________ coverage: platform win32, python 3.13.1-final-0 ________________ 
 
 Name                            Stmts   Miss  Cover
 ---------------------------------------------------
 src\__init__.py                     0      0   100%
-src\base_file_handler.py           10      2    80%
-src\external_api.py                 8      0   100%
-src\head_hunter_api.py             75      4    95%
-src\json_handler.py                78      3    96%
-src\parser_api.py                   7      1    86%
-src\utils.py                      130     45    65%
-src\vacancy.py                     92      0   100%
+src\base_file_handler.py           12      2    83%
+src\external_api.py                 9      0   100%
+src\head_hunter_api.py             76      4    95%
+src\json_handler.py                81      3    96%
+src\parser_api.py                   8      1    88%
+src\utils.py                      128     44    66%
+src\vacancy.py                     95      4    96%
 tests\__init__.py                   0      0   100%
 tests\conftest.py                  37      0   100%
-tests\test_external_api.py         13      0   100%
+tests\test_external_api.py         12      0   100%
 tests\test_head_hunter_api.py      77      2    97%
 tests\test_json_handler.py        152      6    96%
-tests\test_utils.py                62      0   100%
-tests\test_vacancy.py             146     11    92%
+tests\test_utils.py                64      0   100%
+tests\test_vacancy.py             145     12    92%
 ---------------------------------------------------
-TOTAL                             887     74    92%
-======================================== 42 passed in 0.59s =======
+TOTAL                             896     78    91%
+======================================= 42 passed in 0.50s ==============
 ```
 
 ## Примеры работы основных функций:

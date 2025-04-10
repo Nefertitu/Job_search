@@ -1,7 +1,7 @@
 import json
-
 from json import JSONDecodeError
 from unittest.mock import patch
+
 from src.base_file_handler import BaseFileHandler
 from src.json_handler import JsonHandler, log_file, logger
 from src.vacancy import Vacancy
@@ -24,10 +24,10 @@ def test_json_handler_get_data_logger() -> None:
 
     logger.propagate = True
     object_json = JsonHandler()
-    data = object_json.get_data()
+    object_json.get_data()
 
-    with open(log_file, encoding='utf-8') as file_logger:
-        logger_read = (file_logger.read())
+    with open(log_file, encoding="utf-8") as file_logger:
+        logger_read = file_logger.read()
         assert "Получены данные из файла: 'vacancies_save.json'.\n" in logger_read
 
 
@@ -36,7 +36,7 @@ def test_json_handler_get_data_success() -> None:
 
     object_json = JsonHandler()
 
-    with patch.object(object_json, "get_data", return_value={"item": {"vacancy": "Test vacancy"}}) as mock_get_data:
+    with patch.object(object_json, "get_data", return_value={"item": {"vacancy": "Test vacancy"}}):
         object_json.get_data()
         assert object_json.get_data() == {"item": {"vacancy": "Test vacancy"}}
 
@@ -56,7 +56,7 @@ def test_json_handler_get_data_no_file(caplog) -> None:
     except FileNotFoundError as e:
         assert f"{e.__class__.__name__}" == "FileNotFoundError"
 
-    with open(log_file, encoding='utf-8') as file_logger:
+    with open(log_file, encoding="utf-8") as file_logger:
         logger_read = file_logger.read()
         assert "Файл 'example.json' не найден.\n" in logger_read
         assert "Файл 'example.json' не найден." in caplog.text
@@ -68,7 +68,7 @@ def test_json_handler_get_data_decode_error(tmp_path) -> None:
 
     invalid_json_data = "{'vacancy': 'Test vacancy'}"
     test_file = tmp_path / "invalid.json"
-    test_file.write_text(invalid_json_data, encoding='utf-8')
+    test_file.write_text(invalid_json_data, encoding="utf-8")
 
     handler = JsonHandler()
     handler._JsonHandler__file = str(test_file)
@@ -85,7 +85,7 @@ def test_json_handler_add_vacancy_success(vacancy_1: Vacancy, vacancy_2: Vacancy
 
     json_data = ""
     test_file = tmp_path / "data.json"
-    test_file.write_text(json_data, encoding='utf-8')
+    test_file.write_text(json_data, encoding="utf-8")
 
     object_json = JsonHandler()
     object_json._JsonHandler__file = test_file
@@ -101,7 +101,9 @@ def test_json_handler_add_vacancy_success(vacancy_1: Vacancy, vacancy_2: Vacancy
         assert data_values["area"] == vacancy_1.area
         assert data_values["employer"] == vacancy_1.company
         assert data_values["url"] == vacancy_1.url_vacancy
-        assert data_values["salary"] == f"от {vacancy_1.salary_from} до {vacancy_1.salary_to} {vacancy_1.salary_currency}"
+        assert (
+            data_values["salary"] == f"от {vacancy_1.salary_from} до {vacancy_1.salary_to} {vacancy_1.salary_currency}"
+        )
         assert data_values["requirement"] == vacancy_1.requirements
         assert data_values["status"] == vacancy_1.status
         assert data_values["published_at"] == vacancy_1.date_published
@@ -130,7 +132,7 @@ def test_json_handler_add_vacancy_success(vacancy_1: Vacancy, vacancy_2: Vacancy
 def test_json_handler_add_vacancy_2(tmp_path, vacancy_2: Vacancy) -> None:
     """Проверяет, что данные корректно добавляются в JSON-файл"""
 
-    json_data = '''
+    json_data = """
        [
            {
         "2222222": {
@@ -161,12 +163,12 @@ def test_json_handler_add_vacancy_2(tmp_path, vacancy_2: Vacancy) -> None:
         }
     }
        ]
-       '''
+       """
 
     test_file = tmp_path / "data.json"
-    test_file.write_text(json_data, encoding='utf-8')
+    test_file.write_text(json_data, encoding="utf-8")
 
-    with open(test_file, 'r', encoding='utf-8') as file:
+    with open(test_file, "r", encoding="utf-8") as file:
         data_1 = json.load(file)
         list_id_1 = []
         for item, dict in enumerate(data_1):
@@ -196,7 +198,7 @@ def test_json_handler_delete_vacancy(vacancy_1, vacancy_2, tmp_path):
 
     json_data = ""
     test_file = tmp_path / "data.json"
-    test_file.write_text(json_data, encoding='utf-8')
+    test_file.write_text(json_data, encoding="utf-8")
 
     object_json = JsonHandler()
     object_json._JsonHandler__file = test_file
@@ -235,7 +237,7 @@ def test_json_handler_delete_vacancy_decode_error(vacancy_1, tmp_path, caplog) -
 
     json_data = ""
     test_file = tmp_path / "data.json"
-    test_file.write_text(json_data, encoding='utf-8')
+    test_file.write_text(json_data, encoding="utf-8")
 
     object_json = JsonHandler()
     object_json._JsonHandler__file = test_file
@@ -245,22 +247,7 @@ def test_json_handler_delete_vacancy_decode_error(vacancy_1, tmp_path, caplog) -
     except JSONDecodeError as e:
         assert f"{e.__class__.__name__}" == "JsonDecoderError"
 
-    with open(log_file, encoding='utf-8') as file_logger:
+    with open(log_file, encoding="utf-8") as file_logger:
         logger_read = file_logger.read()
         assert "Ошибка при попытке чтения файла: JSONDecodeError.\n" in logger_read
         assert "Ошибка при попытке чтения файла: JSONDecodeError." in caplog.text
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

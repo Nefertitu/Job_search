@@ -3,21 +3,22 @@ import logging
 import sys
 from json import JSONDecodeError
 from pathlib import Path
-from typing import Any
+from types import TracebackType
+from typing import Any, Type, override
 
 from src.base_file_handler import BaseFileHandler
 from src.vacancy import Vacancy
 
-log_dir = Path(__file__).parent.parent / 'data'
+log_dir = Path(__file__).parent.parent / "data"
 log_dir.mkdir(parents=True, exist_ok=True)
-log_file = str((log_dir / 'logging_reports.log').absolute().resolve()).replace("\\", "/")
+log_file = str((log_dir / "logging_reports.log").absolute().resolve()).replace("\\", "/")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 shared_handler = logging.FileHandler(log_file, mode="w", encoding="utf-8")
 shared_handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(levelname)s | %(asctime)s | %(message)s')
+formatter = logging.Formatter("%(levelname)s | %(asctime)s | %(message)s")
 shared_handler.setFormatter(formatter)
 logger.addHandler(shared_handler)
 
@@ -30,12 +31,13 @@ logger.propagate = False
 
 # print(f"Лог файл: {log_file}")
 
-json_saver_file = str((log_dir / 'vacancies_save.json').absolute().resolve()).replace("\\", "/")
+json_saver_file = str((log_dir / "vacancies_save.json").absolute().resolve()).replace("\\", "/")
+
 
 class JsonHandler(BaseFileHandler):
     """Класс для работы с JSON-файлами"""
 
-    def __init__(self, data: list = None, mode: str = 'w') -> None:
+    def __init__(self, data: list | None = None, mode: str = "w") -> None:
         """Конструктор для экземпляра класса `JsonProcessor`"""
         self.data = data
         self.mode: str = mode
@@ -47,14 +49,19 @@ class JsonHandler(BaseFileHandler):
         self.fp = open(self.__file, self.mode, encoding="utf-8")
         return self.fp
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(
+            self,
+            exc_type: Type[BaseException] | None,
+            exc_val: BaseException | None,
+            exc_tb: TracebackType | None
+    ) -> None:
         """Метод для выхода из контекстного менеджера"""
         self.fp.close()
 
-    def get_data(self) -> dict:
+    def get_data(self) -> Any:
         """Метод для получения данных из JSON-файла"""
         try:
-            with open(self.__file, mode='r', encoding='utf-8') as f:
+            with open(self.__file, mode="r", encoding="utf-8") as f:
                 try:
                     data = json.load(f)
                     logger.info(f"Получены данные из файла: '{(self.__file).split("/")[-1]}'.")
@@ -64,13 +71,13 @@ class JsonHandler(BaseFileHandler):
         except FileNotFoundError:
             logger.error(f"Файл '{(self.__file).split("/")[-1]}' не найден.")
 
-
+    @override
     def add_vacancy(self, vacancy: Vacancy) -> None:
         """Метод для добавления данных в JSON-файл"""
 
         vacancies = []
-        data = {vacancy.id_vacancy:
-            {
+        data = {
+            vacancy.id_vacancy: {
                 "name": vacancy.name_vacancy,
                 "area": vacancy.area,
                 "employer": vacancy.company,
@@ -80,18 +87,18 @@ class JsonHandler(BaseFileHandler):
                 "status": vacancy.status,
                 "published_at": vacancy.date_published,
                 "employment_form": vacancy.work_format,
-                "experience": vacancy.experience
+                "experience": vacancy.experience,
             }
         }
 
         try:
-            with open(self.__file, mode='r', encoding='utf-8') as f:
+            with open(self.__file, mode="r", encoding="utf-8") as f:
                 file_vacancies = json.load(f)
         except JSONDecodeError:
             logger.info("Попытка чтения файла - файл для записи вакансий пуст.")
             vacancies.append(data)
-            with open(self.__file, self.mode, encoding='utf-8') as f:
-                json.dump(vacancies, f, ensure_ascii=False, indent=4)   # type: ignore
+            with open(self.__file, self.mode, encoding="utf-8") as f:
+                json.dump(vacancies, f, ensure_ascii=False, indent=4)  # type: ignore
 
         else:
             file_vacancies_id = []
@@ -104,19 +111,20 @@ class JsonHandler(BaseFileHandler):
                     continue
 
             if vacancy.id_vacancy in file_vacancies_id:
-                with open(self.__file, self.mode, encoding='utf-8') as f:
-                    json.dump(vacancies, f, ensure_ascii=False, indent=4)   #type: ignore
+                with open(self.__file, self.mode, encoding="utf-8") as f:
+                    json.dump(vacancies, f, ensure_ascii=False, indent=4)  # type: ignore
 
             else:
                 vacancies.append(data)
-                with open(self.__file, self.mode, encoding='utf-8') as f:
-                    json.dump(vacancies, f, ensure_ascii=False, indent=4)   #type: ignore
+                with open(self.__file, self.mode, encoding="utf-8") as f:
+                    json.dump(vacancies, f, ensure_ascii=False, indent=4)  # type: ignore
 
+    @override
     def delete_vacancy(self, vacancy: Vacancy) -> None:
         """Метод для удаления данных из JSON-файла"""
 
         try:
-            with open(self.__file, mode='r', encoding='utf-8') as f:
+            with open(self.__file, mode="r", encoding="utf-8") as f:
                 file_vacancies = json.load(f)
         except JSONDecodeError as e:
             logger.error(f"Ошибка при попытке чтения файла: {e.__class__.__name__}.")
@@ -124,8 +132,8 @@ class JsonHandler(BaseFileHandler):
         else:
             new_data = [dict for dict in file_vacancies if list(dict.keys())[0] != vacancy.id_vacancy]
 
-            with open(self.__file, self.mode, encoding='utf-8') as f:
-                json.dump(new_data, f, ensure_ascii=False, indent=4)   #type: ignore
+            with open(self.__file, self.mode, encoding="utf-8") as f:
+                json.dump(new_data, f, ensure_ascii=False, indent=4)  # type: ignore
 
 
 # object_json = JsonHandler()

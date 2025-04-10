@@ -1,7 +1,9 @@
+from typing import Any
+
 import requests
 
 
-def get_external_rate(currency_name):
+def get_external_rate(currency_name: str) -> Any:
     """Функция для получения текущего курса валют"""
 
     url = "https://www.cbr-xml-daily.ru/daily_json.js"
@@ -15,4 +17,3 @@ def get_external_rate(currency_name):
 
 
 # print(get_external_rate("BYR"))
-

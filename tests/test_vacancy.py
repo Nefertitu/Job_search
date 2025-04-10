@@ -1,9 +1,6 @@
-import re
-from idlelib.run import capture_warnings
+from unittest.mock import patch
 
 import pytest
-
-from unittest.mock import patch
 
 import src
 from src.vacancy import Vacancy
@@ -18,19 +15,19 @@ def test_vacancy_init(vacancy_1: Vacancy) -> None:
     :return:
     """
 
-    assert vacancy_1.id_vacancy == '1111111'
-    assert vacancy_1.name_vacancy == 'backend/frontend/mobile'
-    assert vacancy_1.area == 'Москва'
-    assert vacancy_1.company == 'Test'
-    assert vacancy_1.url_vacancy == 'https://example_url.com'
+    assert vacancy_1.id_vacancy == "1111111"
+    assert vacancy_1.name_vacancy == "backend/frontend/mobile"
+    assert vacancy_1.area == "Москва"
+    assert vacancy_1.company == "Test"
+    assert vacancy_1.url_vacancy == "https://example_url.com"
     assert vacancy_1.salary_from == 100000
     assert vacancy_1.salary_to == 120000
-    assert vacancy_1.salary_currency == 'RUR'
-    assert vacancy_1.requirements == 'Высшее техническое образование. Знание языка программирования <Python>'
-    assert vacancy_1.status == 'Открытая'
-    assert vacancy_1.date_published == '2024-03-20T17:52:03+0300'
-    assert vacancy_1.work_format == 'Полная'
-    assert vacancy_1.experience == 'От 1 года до 3 лет'
+    assert vacancy_1.salary_currency == "RUR"
+    assert vacancy_1.requirements == "Высшее техническое образование. Знание языка программирования <Python>"
+    assert vacancy_1.status == "Открытая"
+    assert vacancy_1.date_published == "2024-03-20T17:52:03+0300"
+    assert vacancy_1.work_format == "Полная"
+    assert vacancy_1.experience == "От 1 года до 3 лет"
     assert isinstance(vacancy_1, Vacancy) is True
 
 
@@ -106,19 +103,19 @@ def test_vacancy_get_external_rate(mock_get_external_rate=None) -> None:
     """
 
     mock_get_external_rate.return_value = 27.0014
-    result = src.vacancy.get_external_rate("BYR")
+    src.vacancy.get_external_rate("BYR")
     data = {
-        "id": '2222222',
-        "name": 'backend разработчик',
-        "area": {"name": 'Москва'},
-        "employer": {"name": 'Test_2'},
-        "alternate_url": 'https://example_url.com',
-        "salary": {"from": 5000, "to": 7500, "currency": 'BYR'},
-        "snippet": {"requirement": 'Знание <Python>'},
-        "type": {"name": 'Открытая'},
-        "published_at": '2025-03-20T17:52:03+0300',
-        "employment_form": {"name": 'Полная'},
-        "experience": {"name": 'От 1 года до 3 лет'},
+        "id": "2222222",
+        "name": "backend разработчик",
+        "area": {"name": "Москва"},
+        "employer": {"name": "Test_2"},
+        "alternate_url": "https://example_url.com",
+        "salary": {"from": 5000, "to": 7500, "currency": "BYR"},
+        "snippet": {"requirement": "Знание <Python>"},
+        "type": {"name": "Открытая"},
+        "published_at": "2025-03-20T17:52:03+0300",
+        "employment_form": {"name": "Полная"},
+        "experience": {"name": "От 1 года до 3 лет"},
     }
 
     vacancy = Vacancy(data)
@@ -135,17 +132,17 @@ def test_vacancy_replace_requirement() -> None:
     """
 
     data = {
-        "id": '2222222',
-        "name": 'backend разработчик',
-        "area": {"name": 'Москва'},
-        "employer": {"name": 'Test_2'},
-        "alternate_url": 'https://example_url.com',
-        "salary": {"from": 100000, "to": 250000, "currency": 'RUR'},
-        "snippet": {"requirement": 'Знание <highlighttext>Python</highlighttext>'},
-        "type": {"name": 'Открытая'},
-        "published_at": '2025-03-20T17:52:03+0300',
-        "employment_form": {"name": 'Полная'},
-        "experience": {"name": 'От 1 года до 3 лет'},
+        "id": "2222222",
+        "name": "backend разработчик",
+        "area": {"name": "Москва"},
+        "employer": {"name": "Test_2"},
+        "alternate_url": "https://example_url.com",
+        "salary": {"from": 100000, "to": 250000, "currency": "RUR"},
+        "snippet": {"requirement": "Знание <highlighttext>Python</highlighttext>"},
+        "type": {"name": "Открытая"},
+        "published_at": "2025-03-20T17:52:03+0300",
+        "employment_form": {"name": "Полная"},
+        "experience": {"name": "От 1 года до 3 лет"},
     }
     vacancy = Vacancy(data)
     assert vacancy.requirements == "Знание Python"
@@ -161,12 +158,12 @@ def test_vacancy_value_error(capsys) -> None:
     """
 
     data = {
-        "id": '2222222',
-        "name": 'backend разработчик',
+        "id": "2222222",
+        "name": "backend разработчик",
         # "area": {"name": 'Москва'},
-        "alternate_url": 'https://example_url.com',
-        "salary": {"from": 100000, "to": 250000, "currency": 'RUR'},
-        "snippet": {"requirement": 'Знание <highlighttext>Python</highlighttext>'},
+        "alternate_url": "https://example_url.com",
+        "salary": {"from": 100000, "to": 250000, "currency": "RUR"},
+        "snippet": {"requirement": "Знание <highlighttext>Python</highlighttext>"},
     }
     with pytest.raises(KeyError):
         vacancy = Vacancy(data)
@@ -238,31 +235,31 @@ def test_cast_vacancies_in_list() -> None:
     """
 
     data_1 = {
-        "id": '1111111',
-        "name": 'backend/frontend/mobile',
-        "area": {"name": 'Москва'},
-        "employer": {"name": 'Test'},
-        "alternate_url": 'https://example_url.com',
-        "salary": {"from": 100000, "to": 120000, "currency": 'RUR'},
-        "snippet": {"requirement": 'Высшее техническое образование. Знание языка программирования <Python>'},
-        "type": {"name": 'Открытая'},
-        "published_at": '2024-03-20T17:52:03+0300',
-        "employment_form": {"name": 'Полная'},
-        "experience": {"name": 'От 1 года до 3 лет'},
+        "id": "1111111",
+        "name": "backend/frontend/mobile",
+        "area": {"name": "Москва"},
+        "employer": {"name": "Test"},
+        "alternate_url": "https://example_url.com",
+        "salary": {"from": 100000, "to": 120000, "currency": "RUR"},
+        "snippet": {"requirement": "Высшее техническое образование. Знание языка программирования <Python>"},
+        "type": {"name": "Открытая"},
+        "published_at": "2024-03-20T17:52:03+0300",
+        "employment_form": {"name": "Полная"},
+        "experience": {"name": "От 1 года до 3 лет"},
     }
 
     data_2 = {
-        "id": '2222222',
-        "name": 'backend разработчик',
-        "area": {"name": 'Москва'},
-        "employer": {"name": 'Test_2'},
-        "alternate_url": 'https://example_url.com',
-        "salary": {"from": None, "to": 250000, "currency": 'RUR'},
-        "snippet": {"requirement": 'Знание <Python>'},
-        "type": {"name": 'Открытая'},
-        "published_at": '2025-03-20T17:52:03+0300',
-        "employment_form": {"name": 'Полная'},
-        "experience": {"name": 'От 1 года до 3 лет'},
+        "id": "2222222",
+        "name": "backend разработчик",
+        "area": {"name": "Москва"},
+        "employer": {"name": "Test_2"},
+        "alternate_url": "https://example_url.com",
+        "salary": {"from": None, "to": 250000, "currency": "RUR"},
+        "snippet": {"requirement": "Знание <Python>"},
+        "type": {"name": "Открытая"},
+        "published_at": "2025-03-20T17:52:03+0300",
+        "employment_form": {"name": "Полная"},
+        "experience": {"name": "От 1 года до 3 лет"},
     }
 
     data_in_list = [data_1, data_2]
@@ -297,7 +294,8 @@ def test_vacancy_str(vacancy_1: Vacancy, data_4: dict) -> None:
     :return:
     """
 
-    assert (str(vacancy_1)) == """
+    assert (
+        (str(vacancy_1)) == """
             Наименование вакансии - backend/frontend/mobile,
             месторасположение - Москва,
             работодатель - Test,
@@ -308,9 +306,11 @@ def test_vacancy_str(vacancy_1: Vacancy, data_4: dict) -> None:
             дата публикации вакансии - 2024-03-20T17:52:03+0300,
             форма трудоустройства - Полная,
             опыт работы - От 1 года до 3 лет\n"""
+    )
 
     vacancy_2 = Vacancy(data_4)
-    assert (str(vacancy_2)) == """
+    assert (
+        (str(vacancy_2)) == """
             Наименование вакансии - backend разработчик,
             месторасположение - Москва,
             работодатель - Test_2,
@@ -320,6 +320,8 @@ def test_vacancy_str(vacancy_1: Vacancy, data_4: dict) -> None:
             статус вакансии - Открытая,
             форма трудоустройства - Полная,
             опыт работы - От 1 года до 3 лет\n"""
+    )
+
 
 def test_vacancy_repr(vacancy_1: Vacancy) -> None:
     """
@@ -329,20 +331,21 @@ def test_vacancy_repr(vacancy_1: Vacancy) -> None:
     :return:
     """
 
-    assert (repr(vacancy_1)) == """
+    assert ((repr(vacancy_1)) == """
         Vacancy(
-        id='1111111', 
-        name='backend/frontend/mobile', 
-        area='Москва', 
-        employer='Test', 
-        url='https://example_url.com', 
-        salary='от 100000 до 120000 RUR', 
-        requirements='Высшее техническое образование. Знание языка программирования <Python>', 
-        status='Открытая', 
-        published_at='2024-03-20T17:52:03+0300', 
-        employment_form='Полная', 
+        id='1111111',
+        name='backend/frontend/mobile',
+        area='Москва',
+        employer='Test',
+        url='https://example_url.com',
+        salary='от 100000 до 120000 RUR',
+        requirements='Высшее техническое образование. Знание языка программирования <Python>',
+        status='Открытая',
+        published_at='2024-03-20T17:52:03+0300',
+        employment_form='Полная',
         experience='От 1 года до 3 лет'
         )"""
+            )
 
 
 def test_vacancy_validate_data_key_error(data_1: dict, data_3: dict, capsys):
@@ -352,38 +355,51 @@ def test_vacancy_validate_data_key_error(data_1: dict, data_3: dict, capsys):
         vacancy_1 = Vacancy(data_3)
         print(vacancy_1)
         captured_1 = capsys.readouterr()
-        assert captured_1.out == "Отсутствуют необходимые ключи - ['snippet', 'type', 'published_at', 'employment_form', 'experience']"
+        assert (
+            captured_1.out == """
+            Отсутствуют необходимые ключи - ['snippet', 'type', 'published_at', 'employment_form', 'experience']"""
+        )
 
     assert isinstance(data_1, dict) is True
     vacancy_2 = Vacancy(data_1)
-    assert vacancy_2.__slots__ == ("id_vacancy", "name_vacancy", "area", "company",
-                                   "url_vacancy", "salary_from", "salary_to",
-                                   "salary_currency", "requirements", "status",
-                                   "date_published", "work_format", "experience")
+    assert vacancy_2.__slots__ == (
+        "id_vacancy",
+        "name_vacancy",
+        "area",
+        "company",
+        "url_vacancy",
+        "salary_from",
+        "salary_to",
+        "salary_currency",
+        "requirements",
+        "status",
+        "date_published",
+        "work_format",
+        "experience",
+    )
 
     right_len = len(data_1.keys())
 
     data = {
-        "name": 'backend разработчик',
-        "area": {"name": 'Москва'},
-        "employer": {"name": 'Test_2'},
-        "alternate_url": 'https://example_url.com',
-        "salary": {"from": None, "to": 250000, "currency": 'RUR'},
+        "name": "backend разработчик",
+        "area": {"name": "Москва"},
+        "employer": {"name": "Test_2"},
+        "alternate_url": "https://example_url.com",
+        "salary": {"from": None, "to": 250000, "currency": "RUR"},
     }
     assert "id" not in data.keys()
 
     assert len(data.keys()) != right_len
 
-    # with pytest.raises(KeyError):
     try:
         vacancy_4 = Vacancy(data)
-        # print(vacancy_4)
+        print(vacancy_4)
     except KeyError as e:
         print(f"Возникла ошибка KeyError: {e}")
     else:
         print("Не возникла ошибка KeyError")
     captured_3 = capsys.readouterr()
-    assert captured_3.out == 'Возникла ошибка KeyError: "Отсутствуют необходимые ключи - [\'id\']"\n'
+    assert captured_3.out == "Возникла ошибка KeyError: \"Отсутствуют необходимые ключи - ['id']\"\n"
 
 
 def test_vacancy_validate_data_type_error(data_3: dict, capsys):
@@ -396,8 +412,3 @@ def test_vacancy_validate_data_type_error(data_3: dict, capsys):
         print(vacancy_2)
         captured_2 = capsys.readouterr()
         assert captured_2.out == "Ошибка: Данные должны быть словарем."
-
-
-
-
-

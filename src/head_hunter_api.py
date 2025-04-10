@@ -1,22 +1,22 @@
 import logging
 import sys
 from pathlib import Path
+from typing import Any
 
 import requests
 
 from src.parser_api import ParserAPI
 
-
-log_dir = Path(__file__).parent.parent / 'data'
+log_dir = Path(__file__).parent.parent / "data"
 log_dir.mkdir(parents=True, exist_ok=True)
-log_file = str((log_dir / 'logging_reports.log').absolute().resolve()).replace("\\", "/")
+log_file = str((log_dir / "logging_reports.log").absolute().resolve()).replace("\\", "/")
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 shared_handler = logging.FileHandler(log_file, mode="w", encoding="utf-8")
 shared_handler.setLevel(logging.DEBUG)
-formatter = logging.Formatter('%(levelname)s | %(asctime)s | %(message)s')
+formatter = logging.Formatter("%(levelname)s | %(asctime)s | %(message)s")
 shared_handler.setFormatter(formatter)
 logger.addHandler(shared_handler)
 
@@ -29,6 +29,7 @@ logger.propagate = False
 
 # print(f"Лог-файл: {log_file}")
 
+
 class HeadHunterAPI(ParserAPI):
     """
     Класс для работы с API HeadHunter
@@ -36,10 +37,10 @@ class HeadHunterAPI(ParserAPI):
 
     def __init__(self) -> None:
         """Конструктор для создания экземпляра класса `HH`"""
-        self.__url = 'https://api.hh.ru/vacancies'
-        self.__headers = {'User-Agent': 'HH-User-Agent'}
-        self.__params = {'text': '', 'page': 0, 'per_page': 100, 'only_with_salary': 'true'}
-        self.__vacancies = []
+        self.__url: str = "https://api.hh.ru/vacancies"
+        self.__headers: dict = {"User-Agent": "HH-User-Agent"}
+        self.__params: dict = {"text": "", "page": 0, "per_page": 100, "only_with_salary": "true"}
+        self.__vacancies: list = []
         super().__init__()
 
     def __get_connect(self) -> bool:
@@ -63,7 +64,7 @@ class HeadHunterAPI(ParserAPI):
             logger.error(f"Ошибка подключения: {err}")
             # print(f"Ошибка подключения: {err}")
             return False
-        logger.info(f"Соединение с API сайта: 'https://api.hh.ru/' установлено успешно.")
+        logger.info("Соединение с API сайта: 'https://api.hh.ru/' установлено успешно.")
         return True
 
     @property
@@ -86,20 +87,20 @@ class HeadHunterAPI(ParserAPI):
         """Возвращает список вакансий"""
         return self.__vacancies
 
-    def load_vacancies(self, keyword):
+    def load_vacancies(self, keyword: str) -> Any:
         """Метод для загрузки вакансий"""
         if not self.__get_connect():
             logger.error("Не удалось загрузить вакансии, отсутствует подключение.")
             return []
-        self.__params['text'] = keyword
+        self.__params["text"] = keyword
 
-        while self.__params.get('page') != 2:
+        while self.__params.get("page") != 2:
             try:
                 response = requests.get(self.__url, headers=self.__headers, params=self.__params)
                 response.raise_for_status()
-                vacancies = response.json()['items']
+                vacancies = response.json()["items"]
                 self.__vacancies.extend(vacancies)
-                self.__params['page'] += 1
+                self.__params["page"] += 1
             except requests.exceptions.RequestException as e:
                 logger.error(f"Ошибка при загрузке вакансий: {e}")
                 print(f"Ошибка при загрузке вакансий: {e}")
@@ -121,8 +122,8 @@ class HeadHunterAPI(ParserAPI):
 # vacancies = []
 # selected_vacancies = []
 # for vacancy in hh_vacancies:
-    # print(repr(vacancy_))
-    # vacancies.append(Vacancy(vacancy))
+# print(repr(vacancy_))
+# vacancies.append(Vacancy(vacancy))
 #     # print(vacancy_)
 # # print(vacancies)
 #
@@ -171,4 +172,3 @@ class HeadHunterAPI(ParserAPI):
 # # print(top_n_vacancies)
 # print()
 # print(list(set(selected_vacancies) - set(selected_vacancies[:2])))
-
